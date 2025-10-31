@@ -22,7 +22,7 @@ export class VehicleService {
   }
 
   // Find all vehicles with pagination and sorted by manufactured_date ASC
-  async findAll(page = 1, limit = 100): Promise<Vehicle[]> {
+  async findAll(page = 1, limit = 10): Promise<Vehicle[]> {
     const skip = (page - 1) * limit;
 
     return this.vehicleRepo.find({
