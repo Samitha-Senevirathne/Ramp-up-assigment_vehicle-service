@@ -25,7 +25,6 @@ export class CreateVehicleDto {
 
   @Field()
   @IsNotEmpty()
-  @Length(5, 5, { message: 'VIN must be exactly 5 characters' })
   vin: string;
   
  @Field()
