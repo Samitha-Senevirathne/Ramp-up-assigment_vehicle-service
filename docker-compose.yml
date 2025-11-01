@@ -1,36 +1,3 @@
-# version: '3.9'
-
-# services:
-#   redis:
-#     image: redis:latest
-#     container_name: redis
-#     ports:
-#       - "6379:6379"
-#     volumes:
-#       - redis_data:/data
-#     restart: always
-
-#   batch-service:
-#     build: .
-#     container_name: batch-service
-#     ports:
-#       - "3001:3001"
-#     environment:
-#       - PORT=3001
-#       - REDIS_HOST=redis
-#       - REDIS_PORT=6379
-#       - DB_HOST=host.docker.internal
-#       - DB_PORT=5432
-#       - DB_USER=postgres
-#       - DB_PASS=Sam
-#       - DB_NAME=vehicles_db
-#     depends_on:
-#       - redis
-#     command: npm run start:dev
-
-# volumes:
-#   redis_data:
-
 
 
 version: '3.9'

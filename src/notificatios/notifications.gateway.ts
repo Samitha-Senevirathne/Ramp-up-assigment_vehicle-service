@@ -11,7 +11,7 @@ import { Server, Socket } from 'socket.io';
 @WebSocketGateway({ cors: { origin: '*' } })
 export class NotificationsGateway {
   @WebSocketServer() server: Server;
-  private clients = new Map<string, string>(); // userId -> socketId
+  private clients = new Map<string, string>(); //userId -> socketId
 
   handleConnection(client: Socket) {
     const userId = client.handshake.query.userId as string;

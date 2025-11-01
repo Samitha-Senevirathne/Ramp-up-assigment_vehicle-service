@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args,ResolveReference } from '@nestjs/graphql';
 import { VehicleService } from './vehicle.service';
 import { Vehicle } from '../entities/vehicle.entity';
 import { CreateVehicleDto } from '../dto/create-vehicle.dto';
@@ -8,7 +8,7 @@ import { UpdateVehicleDto } from '../dto/update-vehicle.dto';
 export class VehicleResolver {
   constructor(private readonly vehicleService: VehicleService) {}
 
-  //List all vehicles with optional page number
+  //List all vehicles with page number
   @Query(() => [Vehicle], { name: 'findAllVehicles' })
   async getAllVehicles(
     @Args('page', { type: () => Number, nullable: true }) page?: number,
@@ -40,5 +40,29 @@ export class VehicleResolver {
     @Args('car_model', { type: () => String }) car_model: string,
   ): Promise<Vehicle[]> {
     return this.vehicleService.searchByModel(car_model);
+  }
+
+
+
+
+  
+// getvehicleByVIN
+@Query(() => Vehicle, { name: 'findVehicleByVIN', nullable: true })
+async getVehicleByVIN(
+  @Args('vin', { type: () => String }) vin: string,
+): Promise<Vehicle | null> {
+  return this.vehicleService.findOneByVIN(vin);
+}
+
+
+  @ResolveReference()
+  async resolveReference(reference: { vin?: string; id?: string }): Promise<Vehicle | null> {
+    if (reference.vin) {
+      return this.vehicleService.findOneByVIN(reference.vin);
+    }
+    if (reference.id) {
+      return this.vehicleService.findOneById(reference.id);
+    }
+    return null;
   }
 }

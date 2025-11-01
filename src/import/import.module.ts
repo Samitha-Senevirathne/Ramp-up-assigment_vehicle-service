@@ -13,7 +13,7 @@ import { ImportProcessor } from './import.processor';
     TypeOrmModule.forFeature([Vehicle]),
     BullModule.registerQueue({
       name: 'importQueue',
-     // redis: bullConfig.redis,
+     //redis: bullConfig.redis,
 
       redis: {
     host: process.env.REDIS_HOST || 'localhost',

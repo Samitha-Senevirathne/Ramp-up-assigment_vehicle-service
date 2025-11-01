@@ -1,30 +1,3 @@
-// import { Field, InputType } from '@nestjs/graphql';
-
-// @InputType()
-// export class CreateVehicleDto {
-//   @Field()
-//   first_name: string;
-
-//   @Field()
-//   last_name: string;
-
-//   @Field()
-//   email: string;
-
-//   @Field()
-//   car_make: string;
-
-//   @Field()
-//   car_model: string;
-
-//   @Field()
-//   vin: string;
-
-//   @Field()
-//   manufactured_date: Date;
-// }
-
-
 import { Field, InputType } from '@nestjs/graphql';
 import { IsEmail, IsNotEmpty, IsOptional, IsDateString, Length } from 'class-validator';
 
@@ -52,7 +25,7 @@ export class CreateVehicleDto {
 
   @Field()
   @IsNotEmpty()
-  @Length(17, 17, { message: 'VIN must be exactly 17 characters' })
+  @Length(5, 5, { message: 'VIN must be exactly 5 characters' })
   vin: string;
   
  @Field()

@@ -1,10 +1,9 @@
-
-
 // import { Module } from '@nestjs/common';
 // import { TypeOrmModule } from '@nestjs/typeorm';
 // import { GraphQLModule } from '@nestjs/graphql';
 // import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 // import { BullModule } from '@nestjs/bull';
+// import { ServeStaticModule } from '@nestjs/serve-static';
 // import { join } from 'path';
 
 // import { ImportModule } from './import/import.module';
@@ -12,13 +11,17 @@
 // import { NotificationsModule } from './notificatios/notificatios.module';
 // import { VehicleModule } from './vehicle/vehicle.module';
 // import { Vehicle } from './entities/vehicle.entity';
-// //import { databaseConfig } from './config/database.config';
-// //import { bullConfig } from './config/bull.config';
 
 // @Module({
 //   imports: [
-//     //TypeOrmModule.forRoot(databaseConfig),
-//     TypeOrmModule.forRoot ({
+//     //Serve exported CSVs via HTTP 
+//     ServeStaticModule.forRoot({
+//       rootPath: join(__dirname, '..', 'exports'),
+//       serveRoot: '/exports', // Accessible at http://localhost:3000/exports/filename.csv
+//     }),
+
+//     //PostgreSQL Configuration
+//     TypeOrmModule.forRoot({
 //       type: 'postgres',
 //       host: process.env.DB_HOST || 'localhost',
 //       port: parseInt(process.env.DB_PORT || '5432'),
@@ -27,20 +30,24 @@
 //       database: process.env.DB_NAME || 'vehicle_db',
 //       entities: [Vehicle],
 //       synchronize: true,
-// }),
+//     }),
 
+//     // GraphQL Setup
 //     GraphQLModule.forRoot<ApolloDriverConfig>({
 //       driver: ApolloDriver,
 //       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-//       playground: true, // enables browser GraphQL UI
+//       playground: true,
 //     }),
 
-//     BullModule.forRoot({ 
+//     /** ✅ Redis Queue Setup */
+//     BullModule.forRoot({
 //       redis: {
-//     host: process.env.REDIS_HOST || 'localhost',
-//     port: parseInt(process.env.REDIS_PORT || '6379'),
-//   },}),
+//         host: process.env.REDIS_HOST || 'localhost',
+//         port: parseInt(process.env.REDIS_PORT || '6379'),
+//       },
+//     }),
 
+//     /** ✅ Application Modules */
 //     VehicleModule,
 //     ImportModule,
 //     ExportModule,
@@ -49,10 +56,12 @@
 // })
 // export class AppModule {}
 
+
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
 import { BullModule } from '@nestjs/bull';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -65,13 +74,13 @@ import { Vehicle } from './entities/vehicle.entity';
 
 @Module({
   imports: [
-    /** ✅ Serve exported CSVs via HTTP */
+    // Serve exported CSVs via HTTP
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'exports'),
-      serveRoot: '/exports', // Accessible at http://localhost:3000/exports/filename.csv
+      serveRoot: '/exports', // can be access at http://localhost:3000/exports/filename.csv
     }),
 
-    /** ✅ PostgreSQL Configuration */
+    //PostgreSQL Configuration
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
@@ -83,14 +92,17 @@ import { Vehicle } from './entities/vehicle.entity';
       synchronize: true,
     }),
 
-    /** ✅ GraphQL Setup */
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    //Apollo Federation (Subgraph) GraphQL Setup
+    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+      driver: ApolloFederationDriver,
+      autoSchemaFile: {
+        federation: 2,
+        path: join(process.cwd(), 'src/graphql-schema.gql'),
+      },
       playground: true,
     }),
 
-    /** ✅ Redis Queue Setup */
+    // Redis Queue Setup
     BullModule.forRoot({
       redis: {
         host: process.env.REDIS_HOST || 'localhost',
@@ -98,7 +110,7 @@ import { Vehicle } from './entities/vehicle.entity';
       },
     }),
 
-    /** ✅ Application Modules */
+    //Application Modules
     VehicleModule,
     ImportModule,
     ExportModule,

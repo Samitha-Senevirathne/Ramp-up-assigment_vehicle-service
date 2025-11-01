@@ -11,7 +11,7 @@ import { NotificationsModule } from '../notificatios/notificatios.module';
   imports: [
     TypeOrmModule.forFeature([Vehicle]),
     BullModule.registerQueue({ name: 'exportQueue' }),
-    NotificationsModule, // important!
+    NotificationsModule,
   ],
   providers: [ExportService, ExportProcessor],
   controllers: [ExportController],
