@@ -70,7 +70,7 @@ export class ImportProcessor {
             } as Vehicle);
           }
 
-          this.logger.log(`Validation finished. Inserting ${validVehicles.length} vehicles...`);
+          this.logger.log(`Validation finished. Inserting ${validVehicles.length} vehicles.`);
 
           //Insert into database, handle duplicates
           let inserted = 0;

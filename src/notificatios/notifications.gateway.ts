@@ -1,4 +1,3 @@
-
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -6,30 +5,47 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { Logger } from '@nestjs/common';
 
 // notifications.gateway.ts
 @WebSocketGateway({ cors: { origin: '*' } })
 export class NotificationsGateway {
   @WebSocketServer() server: Server;
   private clients = new Map<string, string>(); //userId -> socketId
+  private logger = new Logger('NotificationsGateway');
 
   handleConnection(client: Socket) {
-    const userId = client.handshake.query.userId as string;
-    if (userId) this.clients.set(userId, client.id);
-    console.log(`Client connected: ${client.id}, userId: ${userId}`);
+    try {
+      const userId = client.handshake.query.userId as string;
+      if (userId) this.clients.set(userId, client.id);
+      this.logger.log(`Client connected: ${client.id}, userId: ${userId}`);
+    } catch (error) {
+      this.logger.error(`Error while connnecting client:${error.message}`);
+    }
   }
 
   handleDisconnect(client: Socket) {
-    this.clients.forEach((socketId, userId) => {
-      if (socketId === client.id) this.clients.delete(userId);
-    });
-    console.log(`Client disconnected: ${client.id}`);
+    try {
+      this.clients.forEach((socketId, userId) => {
+        if (socketId === client.id) this.clients.delete(userId);
+      });
+      console.log(`Client disconnected: ${client.id}`);
+    } catch (error) {
+      this.logger.error(`Error while disconnecting client: ${error.message}`);
+    }
   }
 
-  sendNotificationToUser(userId: string, message: string,url?: string ) {
-    const socketId = this.clients.get(userId);
-    if (socketId) {
-      this.server.to(socketId).emit('notification', { message,url, timestamp: new Date() });
+  sendNotificationToUser(userId: string, message: string, url?: string) {
+    try {
+      const socketId = this.clients.get(userId);
+      if (socketId) {
+        this.server
+          .to(socketId)
+          .emit('notification', { message, url, timestamp: new Date() });
+        this.logger.log(`Notification sent to user: ${userId}`);
+      }
+    } catch (error) {
+      this.logger.error(`error while sending notification:${error.message}`);
     }
   }
 }
