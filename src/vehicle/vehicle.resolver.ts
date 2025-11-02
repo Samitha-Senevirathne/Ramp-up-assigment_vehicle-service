@@ -65,4 +65,10 @@ async getVehicleByVIN(
     }
     return null;
   }
+
+  //findAll without pagination
+  @Query(() => [Vehicle],{name:'findAllVehiclesNoPagination'})
+async findAllVehiclesNoPagination(): Promise<Vehicle[]> {
+  return this.vehicleService.findAllNoPagination();
+}
 }

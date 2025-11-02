@@ -16,14 +16,14 @@ export class VehicleService {
   ) {}
 
   // Create a new vehicle
-  async create(createVehicleDto: CreateVehicleDto): Promise<Vehicle> {
+  async create(createDto: CreateVehicleDto): Promise<Vehicle> {
     try {
       const age =
         new Date().getFullYear() -
-        new Date(createVehicleDto.manufactured_date).getFullYear();
+        new Date(createDto.manufactured_date).getFullYear();
 
       const vehicle = this.vehicleRepo.create({
-        ...createVehicleDto,
+        ...createDto,
         age_of_vehicle: age,
       });
 
@@ -42,7 +42,7 @@ export class VehicleService {
       const skip = (page - 1) * limit;
       const vehicles = await this.vehicleRepo.find({
         order: { manufactured_date: 'ASC' },
-        take: limit,
+        take: limit,    //how many records to fetch
         skip,
       });
       this.logger.log(`Fetched ${vehicles.length} vehicles`);
@@ -95,26 +95,22 @@ export class VehicleService {
     }
   }
 
-  // Search vehicles by model
+
+//search by model
   async searchByModel(car_model: string): Promise<Vehicle[]> {
-    try {
-      let search = car_model.replace(/\*/g, '%');
-      if (!search.includes('%')) {
-        search = `%${search}%`;
-      }
+  try {
+    const vehicles = await this.vehicleRepo.find({
+      where: { car_model: ILike(`%${car_model}%`) },
+      order: { manufactured_date: 'ASC' },
+    });
 
-      const results = await this.vehicleRepo.find({
-        where: { car_model: ILike(search) },
-        order: { manufactured_date: 'ASC' },
-      });
-
-      this.logger.log(`Found ${results.length} vehicles for model: ${car_model}`);
-      return results;
-    } catch (error) {
-      this.logger.error(`Error searching by model: ${error.message}`);
-      throw error;
-    }
+    this.logger.debug(`Found ${vehicles.length} vehicles matching: ${car_model}`);
+    return vehicles;
+  } catch (error) {
+    this.logger.error(`Failed to search vehicles: ${error.message}`);
+    throw error;
   }
+}
 
   // Find one vehicle by VIN
   async findOneByVIN(vin: string): Promise<Vehicle | null> {
@@ -143,4 +139,18 @@ export class VehicleService {
       throw error;
     }
   }
+
+  // Find all vehicles without pagination
+async findAllNoPagination(): Promise<Vehicle[]> {
+  try {
+    const vehicles = await this.vehicleRepo.find({
+      order: { manufactured_date: 'ASC' },
+    });
+    this.logger.log(`Fetched ${vehicles.length} vehicles`);
+    return vehicles;
+  } catch (error) {
+    this.logger.error(`Error fetching vehicles: ${error.message}`);
+    throw error;
+  }
+}
 }

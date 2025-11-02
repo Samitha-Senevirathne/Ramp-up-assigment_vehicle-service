@@ -7,11 +7,10 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 
-// notifications.gateway.ts
 @WebSocketGateway({ cors: { origin: '*' } })
 export class NotificationsGateway {
   @WebSocketServer() server: Server;
-  private clients = new Map<string, string>(); //userId -> socketId
+  private clients = new Map<string, string>(); //userId to socketId
   private logger = new Logger('NotificationsGateway');
 
   handleConnection(client: Socket) {

@@ -23,6 +23,7 @@ type Query {
   findAllVehicles(page: Float): [Vehicle!]!
   searchByModel(car_model: String!): [Vehicle!]!
   findVehicleByVIN(vin: String!): Vehicle
+  findAllVehiclesNoPagination: [Vehicle!]!
 }
 
 type Mutation {
