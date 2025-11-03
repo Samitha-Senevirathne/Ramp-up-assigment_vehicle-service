@@ -5,9 +5,12 @@ import * as fs from 'fs';
 import { join } from 'path';
 import { Vehicle } from '../entities/vehicle.entity';
 import { NotificationsGateway } from '../notificatios/notifications.gateway';
+import { Logger } from '@nestjs/common';
 
 @Processor('exportQueue')
 export class ExportProcessor {
+  private readonly logger = new Logger(ExportProcessor.name);
+
   constructor(
     private exportService: ExportService,
     private notificationsGateway: NotificationsGateway,
@@ -17,33 +20,50 @@ export class ExportProcessor {
   async handleExport(job: Job) {
     const { filePath, minAge, userId } = job.data;
     const exportsDir = join(process.cwd(), 'exports');
-    if (!fs.existsSync(exportsDir)) fs.mkdirSync(exportsDir, { recursive: true });
 
-    console.log(`Processing export for user ${userId}...`);
+    try {
+      if (!fs.existsSync(exportsDir)) {
+        fs.mkdirSync(exportsDir, { recursive: true });
+        this.logger.log(`Created exports directory at: ${exportsDir}`);
+      }
 
-    const vehicles: Vehicle[] = await this.exportService.fetchVehicles(minAge);
+      this.logger.log(`Starting export process for user: ${userId}`);
 
-    const header =
-      'id,first_name,last_name,email,car_make,car_model,vin,manufactured_date,age_of_vehicle\n';
-    const rows = vehicles
-      .map(
-        (v) =>
-          `${v.id},${v.first_name},${v.last_name},${v.email},${v.car_make},${v.car_model},${v.vin},${v.manufactured_date?.toISOString() ?? ''},${v.age_of_vehicle}`,
-      )
-      .join('\n');
+      const vehicles: Vehicle[] = await this.exportService.fetchVehicles(minAge);
+      this.logger.log(`Fetched ${vehicles.length} vehicle records for export`);
 
-    fs.writeFileSync(filePath, header + rows);
-    console.log(`Export completed: ${filePath}`);
+      const header =
+        'id,first_name,last_name,email,car_make,car_model,vin,manufactured_date,age_of_vehicle\n';
+      const rows = vehicles
+        .map(
+          (v) =>
+            `${v.id},${v.first_name},${v.last_name},${v.email},${v.car_make},${v.car_model},${v.vin},${v.manufactured_date?.toISOString() ?? ''},${v.age_of_vehicle}`,
+        )
+        .join('\n');
 
-    const fileName = filePath.split('\\').pop() || filePath.split('/').pop();
-    const downloadUrl = `http://localhost:3000/export/download/${fileName}`;
+      fs.writeFileSync(filePath, header + rows);
+      this.logger.log(`Export completed successfully: ${filePath}`);
 
-    if (userId) {
-      this.notificationsGateway.sendNotificationToUser(
-        userId,
-        `Export completed. <a href="${downloadUrl}" target="_blank">Click here to download</a>`,
-      );
+      const fileName = filePath.split('\\').pop() || filePath.split('/').pop();
+      const downloadUrl = `http://localhost:3000/export/download/${fileName}`;
+
+      if (userId) {
+        this.notificationsGateway.sendNotificationToUser(
+          userId,
+          `Export completed. <a href="${downloadUrl}" target="_blank">Click here to download</a>`,
+        );
+        this.logger.log(`Notification sent to user ${userId}`);
+      }
+    } catch (error) {
+      this.logger.error(`Error during export process: ${error.message}`, error.stack);
+
+      // Notify user if something went wrong
+      if (userId) {
+        this.notificationsGateway.sendNotificationToUser(
+          userId,
+          `Export failed. Please try again later.`,
+        );
+      }
     }
   }
 }
-

@@ -1,9 +1,10 @@
-import { Directive, Field, ID, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Directive, Field, ID, ObjectType, } from '@nestjs/graphql';
+import { Column, Entity, PrimaryGeneratedColumn ,Unique} from 'typeorm';
 
 @ObjectType()
 @Directive('@key(fields: "vin")') //federation key
 @Entity()
+@Unique(['vin'])
 export class Vehicle {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
@@ -30,7 +31,7 @@ export class Vehicle {
   car_model: string;
 
   @Field()
-  @Column()
+  @Column({unique:true})
   vin: string;
 
   @Field({ nullable: true })

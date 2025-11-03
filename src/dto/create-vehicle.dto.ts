@@ -28,6 +28,5 @@ export class CreateVehicleDto {
   vin: string;
   
  @Field()
- @IsDateString()
  manufactured_date: Date;
 }
