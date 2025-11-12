@@ -53,7 +53,7 @@ export class VehicleService {
     }
   }
 
-  // Update vehicle info
+  //Update vehicle info
   async updateVehicle(updateDto: UpdateVehicleDto): Promise<Vehicle> {
     try {
       if (updateDto.manufactured_date) {
@@ -78,7 +78,7 @@ export class VehicleService {
     }
   }
 
-  // Delete vehicle
+  //Delete vehicle
   async deleteVehicle(id: string): Promise<boolean> {
     try {
       const result = await this.vehicleRepo.delete(id);

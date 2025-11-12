@@ -9,8 +9,11 @@ import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class NotificationsGateway {
-  @WebSocketServer() server: Server;
-  private clients = new Map<string, string>(); //userId to socketId
+
+    //to access the socekt.io server instance
+  @WebSocketServer() server: Server;  
+
+  private clients = new Map<string, string>(); // stores mapping userId to socketId
   private logger = new Logger('NotificationsGateway');
 
   handleConnection(client: Socket) {
@@ -26,7 +29,7 @@ export class NotificationsGateway {
   handleDisconnect(client: Socket) {
     try {
       this.clients.forEach((socketId, userId) => {
-        if (socketId === client.id) this.clients.delete(userId);
+        if (socketId === client.id) this.clients.delete(userId); //loop through all the stored mappings find which userId has this socketId and delete
       });
       console.log(`Client disconnected: ${client.id}`);
     } catch (error) {

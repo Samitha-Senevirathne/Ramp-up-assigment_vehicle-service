@@ -8,13 +8,7 @@ import { UpdateVehicleDto } from '../dto/update-vehicle.dto';
 export class VehicleResolver {
   constructor(private readonly vehicleService: VehicleService) {}
 
-  //List all vehicles with page number
-  @Query(() => [Vehicle], { name: 'findAllVehicles' })
-  async getAllVehicles(
-    @Args('page', { type: () => Number, nullable: true }) page?: number,
-  ): Promise<Vehicle[]> {
-    return this.vehicleService.findAll(page);
-  }
+ 
 
   //Create a new vehicle
   @Mutation(() => Vehicle, { name: 'createVehicle' })
@@ -42,7 +36,13 @@ export class VehicleResolver {
     return this.vehicleService.searchByModel(car_model);
   }
 
-
+ //List all vehicles with page number
+  @Query(() => [Vehicle], { name: 'findAllVehicles' })
+  async getAllVehicles(
+    @Args('page', { type: () => Number, nullable: true }) page?: number,
+  ): Promise<Vehicle[]> {
+    return this.vehicleService.findAll(page);
+  }
 
 
   
@@ -56,13 +56,11 @@ async getVehicleByVIN(
 
 
   @ResolveReference()
-  async resolveReference(reference: { vin?: string; id?: string }): Promise<Vehicle | null> {
+  async resolveReference(reference: { vin?: string}): Promise<Vehicle | null> {
     if (reference.vin) {
       return this.vehicleService.findOneByVIN(reference.vin);
     }
-    if (reference.id) {
-      return this.vehicleService.findOneById(reference.id);
-    }
+  
     return null;
   }
 

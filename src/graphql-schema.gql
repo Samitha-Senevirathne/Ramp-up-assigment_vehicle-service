@@ -10,8 +10,8 @@ type Vehicle {
   car_make: String!
   car_model: String!
   vin: String!
-  manufactured_date: DateTime
-  age_of_vehicle: Float
+  manufactured_date: DateTime!
+  age_of_vehicle: Float!
 }
 
 """
@@ -20,8 +20,8 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Query {
-  findAllVehicles(page: Float): [Vehicle!]!
   searchByModel(car_model: String!): [Vehicle!]!
+  findAllVehicles(page: Float): [Vehicle!]!
   findVehicleByVIN(vin: String!): Vehicle
   findAllVehiclesNoPagination: [Vehicle!]!
 }

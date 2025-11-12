@@ -8,18 +8,50 @@ import { join } from 'path';
 export class ExportController {
   constructor(private exportService: ExportService) {}
 
+//   @Post('vehicles')
+//   async exportVehicles(@Body('minAge') minAge?: number, @Body('userId') userId?: string) {
+//     return this.exportService.queueExport(minAge, userId);
+//   }
+
+
   @Post('vehicles')
-  async exportVehicles(@Body('minAge') minAge?: number, @Body('userId') userId?: string) {
-    return this.exportService.queueExport(minAge, userId);
-  }
+   async exportVehicles(@Body('minAge') minAge?: number, @Body('userId') userId?: string){
+    try{
+            return this.exportService.queueExport(minAge, userId);
 
-  @Get('download/:filename')
-  async downloadFile(@Param('filename') filename: string, @Res() res: Response) {
-    const filePath = join(process.cwd(), 'exports', filename);
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).send('File not found');
+    }catch(error){
+
+            return { statusCode: 500, message: error.message || 'Internal Server Error' };
+
     }
+   }
 
+
+//   @Get('download/:filename')
+//   async downloadFile(@Param('filename') filename: string, @Res() res: Response) {
+//     const filePath = join(process.cwd(), 'exports', filename);
+//     if (!fs.existsSync(filePath)) {
+//       return res.status(404).send('File not found');
+//     }
+
+//     res.download(filePath, filename, (err) => {
+//       if (!err) {
+//         fs.unlink(filePath, (unlinkErr) => {
+//           if (unlinkErr) console.error('Error deleting file:', unlinkErr);
+//           else console.log('Deleted file:', filename);
+//         });
+//       }
+//     });
+//   }
+
+
+@Get('download/:filename')
+async downloadFile(@Param('filename') filename: string, @Res() res: Response) {
+  const filePath = join(process.cwd(), 'exports', filename);
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send('File not found');
+  }
+  try {
     res.download(filePath, filename, (err) => {
       if (!err) {
         fs.unlink(filePath, (unlinkErr) => {
@@ -27,7 +59,15 @@ export class ExportController {
           else console.log('Deleted file:', filename);
         });
       }
+      if (err) {
+        console.error('Download error:', err);
+        res.status(500).send('Error downloading file');
+      }
     });
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    res.status(500).send('Internal Server Error');
   }
+}
 }
 

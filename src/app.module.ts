@@ -32,7 +32,7 @@ import { Vehicle } from './entities/vehicle.entity';
       synchronize: true,
     }),
 
-    //Apollo Federation (Subgraph) GraphQL Setup
+    //Apollo Federation GraphQL Setup
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {
