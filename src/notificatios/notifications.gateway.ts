@@ -7,6 +7,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 
+
 @WebSocketGateway({ cors: { origin: '*' } })
 export class NotificationsGateway {
 

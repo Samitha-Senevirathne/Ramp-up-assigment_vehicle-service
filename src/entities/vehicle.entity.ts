@@ -40,7 +40,6 @@ export class Vehicle {
   @Field()
    @IsNotEmpty()
   @Column({unique:true})
-  
   vin: string;
 
   @Field({ nullable: false })

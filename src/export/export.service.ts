@@ -16,12 +16,6 @@ export class ExportService {
     @InjectRepository(Vehicle) private vehicleRepo: Repository<Vehicle>,
   ) {}
 
-//   async queueExport(minAge?: number, userId?: string) {
-//     const filePath = join(process.cwd(), 'exports', `export-${Date.now()}.csv`);
-//     await this.exportQueue.add('processExport', { filePath, minAge, userId }); //pass userId
-//     return { message: 'Export job queued', filePath };
-//   }
-
 
 
   async queueExport (minAge?: number, userId?: string){
@@ -37,12 +31,7 @@ export class ExportService {
     }
   }
 
-//   async fetchVehicles(minAge?: number) {
-//     if (minAge) {
-//       return this.vehicleRepo.find({ where: { age_of_vehicle: MoreThanOrEqual(minAge) } });
-//     }
-//     return this.vehicleRepo.find();
-//   }
+
 
   async fetchVehicles(minAge?: number) {
   try {

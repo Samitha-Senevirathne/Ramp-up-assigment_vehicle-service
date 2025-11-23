@@ -8,16 +8,9 @@ export class ImportService {
 
     constructor(@InjectQueue('importQueue')private importQueue:Queue) {}
 
-
-    // async addFileToQueue(filePath:string){
-    //     //Adds a new job called processImport into Redis with the file path.
-    //     await this.importQueue.add('processImport',{filePath});
-    //     return {message:'file queued for import'};
-    // }
-
     async addFileToQueue(filePath: string) {
   try {
-    await this.importQueue.add('processImport', { filePath });
+    await this.importQueue.add('processImport', { filePath });  //Adds a new job called processImport into Redis with the file path
     return { message: 'file queuedd  for import' };
   } catch (error) {
     console.error('Error happend queueing import job:', error);

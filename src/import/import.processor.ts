@@ -22,13 +22,14 @@ export class ImportProcessor {
 
   @Process('processImport')
   async handleImport(job: Job) {
-    const { filePath } = job.data; // Get the csv file path from the job
+    const { filePath } = job.data; //Get the csv file path from the job
     this.logger.log(`Starting to import file: ${filePath}`);
 
-    const rows: any[] = []; // To store all rows from the CSV
-    let rowNumber = 2; // Row number starts at 2 because row 1 is header
+    const rows: any[] = []; //To store all rows from the CSV
+    let rowNumber = 2; 
 
     return new Promise<void>((resolve, reject) => {
+      //create stream to read dfile
       fs.createReadStream(filePath)
         .pipe(csvParser())
         .on('data', (row) => {
@@ -44,9 +45,9 @@ export class ImportProcessor {
 
           this.logger.log('Validating each CSV row...');
 
-          // Validate all rows one by one
+          //Validate all rows one by one
           for (const row of rows) {
-            // Convert plain CSV row to CreateVehicleDto object
+            //Convert plain CSV row to CreateVehicleDto object
             const dto = plainToInstance(CreateVehicleDto, {
               first_name: row.first_name,
               last_name: row.last_name,
@@ -57,7 +58,7 @@ export class ImportProcessor {
               manufactured_date: row.manufactured_date ? new Date(row.manufactured_date) : null,
             });
 
-            // Check for validation errors
+            //check for validation errors
             const errors = await validate(dto);
             if (errors.length) {
               const messages = errors
@@ -76,7 +77,7 @@ export class ImportProcessor {
               continue; // Skip invalid row
             }
 
-            // Calculate vehicle age if date is available
+            //Calculate vehicle age if date is available
             const age = dto.manufactured_date
               ? new Date().getFullYear() - dto.manufactured_date.getFullYear()
               : null;

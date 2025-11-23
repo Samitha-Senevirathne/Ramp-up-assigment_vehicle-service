@@ -42,7 +42,7 @@ export class VehicleService {
       const skip = (page - 1) * limit;
       const vehicles = await this.vehicleRepo.find({
         order: { manufactured_date: 'ASC' },
-        take: limit,    //how many records to fetch
+        take: limit,    //how many records to fetch per page 
         skip,
       });
       this.logger.log(`Fetched ${vehicles.length} vehicles`);
